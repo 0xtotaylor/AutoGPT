@@ -1,7 +1,9 @@
+import 'package:auto_gpt_flutter_client/viewmodels/plugins_viewmodel.dart';
 import 'package:auto_gpt_flutter_client/viewmodels/settings_viewmodel.dart';
 import 'package:auto_gpt_flutter_client/viewmodels/skill_tree_viewmodel.dart';
 import 'package:auto_gpt_flutter_client/viewmodels/task_viewmodel.dart';
 import 'package:auto_gpt_flutter_client/viewmodels/chat_viewmodel.dart';
+import 'package:auto_gpt_flutter_client/views/plugins/plugins_view.dart';
 import 'package:auto_gpt_flutter_client/views/settings/settings_view.dart';
 import 'package:auto_gpt_flutter_client/views/side_bar/side_bar_view.dart';
 import 'package:auto_gpt_flutter_client/views/skill_tree/skill_tree_view.dart';
@@ -25,6 +27,7 @@ class MainLayout extends StatelessWidget {
     final taskViewModel = Provider.of<TaskViewModel>(context);
     final chatViewModel = Provider.of<ChatViewModel>(context);
     final settingsViewModel = Provider.of<SettingsViewModel>(context);
+    final pluginsViewModel = Provider.of<PluginsViewModel>(context);
 
     // Initialize the width for the SideBarView
     double sideBarWidth = 60.0;
@@ -78,6 +81,22 @@ class MainLayout extends StatelessWidget {
                             width: settingsViewWidth,
                             // Render the SettingsView with the same width as TaskView
                             child: SettingsView(viewModel: settingsViewModel)),
+                        SizedBox(
+                            width: chatViewWidth,
+                            // Render the ChatView next to the SettingsView
+                            child: ChatView(viewModel: chatViewModel)),
+                      ],
+                    );
+                  } else if (value == 'PluginsView') {
+                    // TODO: Handle this state reset better
+                    skillTreeViewModel.resetState();
+                    chatViewWidth = remainingWidth - settingsViewWidth;
+                    return Row(
+                      children: [
+                        SizedBox(
+                            width: settingsViewWidth,
+                            // Render the SettingsView with the same width as TaskView
+                            child: PluginsView(viewModel: pluginsViewModel)),
                         SizedBox(
                             width: chatViewWidth,
                             // Render the ChatView next to the SettingsView

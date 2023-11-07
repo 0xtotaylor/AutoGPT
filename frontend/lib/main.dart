@@ -1,5 +1,7 @@
 import 'package:auto_gpt_flutter_client/services/leaderboard_service.dart';
+import 'package:auto_gpt_flutter_client/services/mindware_service.dart';
 import 'package:auto_gpt_flutter_client/services/shared_preferences_service.dart';
+import 'package:auto_gpt_flutter_client/viewmodels/plugins_viewmodel.dart';
 import 'package:auto_gpt_flutter_client/viewmodels/settings_viewmodel.dart';
 import 'package:auto_gpt_flutter_client/viewmodels/task_queue_viewmodel.dart';
 import 'package:auto_gpt_flutter_client/views/auth/firebase_auth_view.dart';
@@ -58,6 +60,10 @@ void main() async {
         ProxyProvider<RestApiUtility, LeaderboardService>(
           update: (context, restApiUtility, leaderboardService) =>
               LeaderboardService(restApiUtility),
+        ),
+        ProxyProvider<RestApiUtility, MindwareService>(
+          update: (context, restApiUtility, mindwareService) =>
+              MindwareService(restApiUtility),
         ),
         ChangeNotifierProxyProvider2<RestApiUtility, SharedPreferencesService,
             SettingsViewModel>(
@@ -122,6 +128,9 @@ class MyApp extends StatelessWidget {
                         listen: false),
                   ),
                 ),
+                ChangeNotifierProvider(
+                    create: (context) => PluginsViewModel(
+                        Provider.of<MindwareService>(context, listen: false))),
               ],
               child: MainLayout(),
             ); // User is signed in

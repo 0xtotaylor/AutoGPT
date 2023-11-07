@@ -7,6 +7,7 @@ class RestApiUtility {
   String _agentBaseUrl;
   final String _benchmarkBaseUrl = "http://127.0.0.1:8080/ap/v1";
   final String _leaderboardBaseUrl = "https://leaderboard.agpt.co";
+  final String _mindwareBaseUrl = "https://mindware-app-react-dakmrs844-mindware.vercel.app";
 
   RestApiUtility(this._agentBaseUrl);
 
@@ -22,12 +23,14 @@ class RestApiUtility {
         return _benchmarkBaseUrl;
       case ApiType.leaderboard:
         return _leaderboardBaseUrl;
+      case ApiType.mindware:
+        return _mindwareBaseUrl;
       default:
         return _agentBaseUrl;
     }
   }
 
-  Future<Map<String, dynamic>> get(String endpoint,
+  Future<dynamic> get(String endpoint,
       {ApiType apiType = ApiType.agent}) async {
     final effectiveBaseUrl = _getEffectiveBaseUrl(apiType);
     final response = await http.get(Uri.parse('$effectiveBaseUrl/$endpoint'));

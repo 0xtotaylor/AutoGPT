@@ -66,6 +66,15 @@ class SideBarView extends StatelessWidget {
                         onPressed: () =>
                             selectedViewNotifier.value = 'SettingsView',
                       ),
+                      IconButton(
+                        splashRadius: 0.1,
+                        color: selectedView == 'PluginsView'
+                            ? Colors.blue
+                            : Colors.black,
+                        icon: const Icon(Icons.power),
+                        onPressed: () =>
+                            selectedViewNotifier.value = 'PluginsView',
+                      ),
                     ],
                   ),
                   const Spacer(),
