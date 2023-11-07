@@ -10,8 +10,8 @@ class PluginsView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.grey,
+        foregroundColor: Colors.black,
         title: const Text('Plugins'),
       ),
       body: FutureBuilder<List<dynamic>>(
