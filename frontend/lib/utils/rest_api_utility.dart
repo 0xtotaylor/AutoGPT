@@ -7,7 +7,7 @@ class RestApiUtility {
   String _agentBaseUrl;
   final String _benchmarkBaseUrl = "http://127.0.0.1:8080/ap/v1";
   final String _leaderboardBaseUrl = "https://leaderboard.agpt.co";
-  final String _mindwareBaseUrl = "https://mindware-app-react-dakmrs844-mindware.vercel.app";
+  final String _mindwareBaseUrl = "https://mindware.xyz";
 
   RestApiUtility(this._agentBaseUrl);
 
