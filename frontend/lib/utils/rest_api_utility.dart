@@ -7,7 +7,7 @@ class RestApiUtility {
   String _agentBaseUrl;
   final String _benchmarkBaseUrl = "http://127.0.0.1:8080/ap/v1";
   final String _leaderboardBaseUrl = "https://leaderboard.agpt.co";
-  final String _mindwareBaseUrl = "https://mindware.xyz";
+  final String _pluginBaseUrl = "https://mindware.xyz";
 
   RestApiUtility(this._agentBaseUrl);
 
@@ -23,8 +23,8 @@ class RestApiUtility {
         return _benchmarkBaseUrl;
       case ApiType.leaderboard:
         return _leaderboardBaseUrl;
-      case ApiType.mindware:
-        return _mindwareBaseUrl;
+      case ApiType.plugin:
+        return _pluginBaseUrl;
       default:
         return _agentBaseUrl;
     }

@@ -1,13 +1,13 @@
-import 'package:auto_gpt_flutter_client/services/mindware_service.dart';
+import 'package:auto_gpt_flutter_client/services/plugin_service.dart';
 import 'package:flutter/material.dart';
 
 class PluginsViewModel extends ChangeNotifier {
-  final MindwareService mindwareService;
+  final PluginService pluginService;
 
-  PluginsViewModel(this.mindwareService);
+  PluginsViewModel(this.pluginService);
 
   Future<List<dynamic>> getPlugins() async {
-    final List<dynamic> plugins = await mindwareService.getPlugins();
+    final List<dynamic> plugins = await pluginService.getPlugins();
     return plugins;
   }
 }
