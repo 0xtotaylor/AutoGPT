@@ -1,10 +1,20 @@
 import 'package:auto_gpt_flutter_client/viewmodels/plugins_viewmodel.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PluginsView extends StatelessWidget {
   final PluginsViewModel viewModel;
 
   const PluginsView({Key? key, required this.viewModel}) : super(key: key);
+
+  void _launchURL(String urlString) async {
+    var url = Uri.parse(urlString);
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,16 +48,60 @@ class PluginsView extends StatelessWidget {
                                     Container(
                                       margin: const EdgeInsets.only(
                                           top: 10, bottom: 5),
-                                      child: ElevatedButton(
-                                        onPressed: () {
-                                          // TODO: Install plugin
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.blue,
-                                            foregroundColor: Colors.white),
-                                        child: const Text('Install'),
+                                      child: Row(
+                                        children: [
+                                          if (viewModel.installedPlugin !=
+                                              plugin['link'])
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                viewModel.installPlugin(
+                                                    plugin['link']);
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.blue,
+                                                  foregroundColor:
+                                                      Colors.white),
+                                              child: const Text('Install'),
+                                            ),
+                                          if (viewModel.installedPlugin !=
+                                              plugin['link'])
+                                            const SizedBox(
+                                              width: 8,
+                                            ),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              _launchURL(plugin['link']);
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.grey,
+                                                foregroundColor: Colors.white),
+                                            child: const Text('Details'),
+                                          ),
+                                        ],
                                       ),
                                     ),
+                                    if (viewModel.installedPlugin ==
+                                        plugin['link'])
+                                      Container(
+                                        margin: const EdgeInsets.only(
+                                            top: 10, bottom: 5),
+                                        child: const Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Plugin Installed',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.green),
+                                            ),
+                                            Text(
+                                              'Add required environment variables and restart AutoGPT for the changes to take effect',
+                                              style: TextStyle(fontSize: 12),
+                                            )
+                                          ],
+                                        ),
+                                      ),
                                     const Divider(),
                                   ],
                                 ),

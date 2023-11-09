@@ -130,7 +130,8 @@ class MyApp extends StatelessWidget {
                 ),
                 ChangeNotifierProvider(
                     create: (context) => PluginsViewModel(
-                        Provider.of<PluginService>(context, listen: false))),
+                        Provider.of<PluginService>(context, listen: false),
+                        Provider.of<TaskService>(context, listen: false))),
               ],
               child: MainLayout(),
             ); // User is signed in

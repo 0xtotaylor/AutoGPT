@@ -1,11 +1,14 @@
 import logging
 import os
 import pathlib
+import git
+import shutil
+from urllib.parse import urlparse
 from io import BytesIO
 from uuid import uuid4
 
 import orjson
-from fastapi import APIRouter, FastAPI, UploadFile
+from fastapi import APIRouter, FastAPI, UploadFile, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
@@ -100,6 +103,40 @@ class AgentProtocolServer:
             logger.warning(
                 f"Frontend not found. {frontend_path} does not exist. The frontend will not be available."
             )
+
+        @app.post("/ap/v1/install-plugin", include_in_schema=False)
+        async def install_plugin(request: Request):
+            body = await request.json()
+            plugin_url = body.get('pluginUrl')
+            plugins_directory = 'plugins'
+            plugins_config_path = 'plugins_config.yaml'
+            
+            parsed_url = urlparse(plugin_url)
+            path_components = parsed_url.path.strip("/").split("/")
+            repository_url = f"{parsed_url.scheme}://{parsed_url.netloc}/{path_components[0]}/{path_components[1]}"
+            repository_name = path_components[1]
+
+            if not os.path.exists(plugins_directory):
+                os.makedirs(plugins_directory)
+
+            with open(plugins_config_path, 'a') as file:
+                pass
+
+            try:
+                plugin_repo_directory = os.path.join(plugins_directory, "temp", repository_name)
+                repo = git.Repo.clone_from(repository_url, plugin_repo_directory, branch='master')
+                zip_file_path = os.path.join(plugins_directory, repository_name)
+                if os.path.exists(f"{zip_file_path}.zip"):
+                    os.remove(f"{zip_file_path}.zip")
+                shutil.make_archive(zip_file_path, 'zip', plugin_repo_directory)
+                shutil.rmtree(plugin_repo_directory)
+                with open(plugins_config_path, 'a') as file:
+                    # TODO: Get plugin name for config
+                    plugin_config = "\nMindwarePlugin:\n  config: {}\n  enabled: true"
+                    file.write(plugin_config)
+                print(f"Plugin added successfully")
+            except Exception as e:
+                print(f"Error adding plugin: {e}")
 
         # Used to access the methods on this class from API route handlers
         app.add_middleware(AgentMiddleware, agent=self)

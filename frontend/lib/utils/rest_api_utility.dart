@@ -41,7 +41,7 @@ class RestApiUtility {
     }
   }
 
-  Future<Map<String, dynamic>> post(
+  Future<dynamic> post(
       String endpoint, Map<String, dynamic> payload,
       {ApiType apiType = ApiType.agent}) async {
     final effectiveBaseUrl = _getEffectiveBaseUrl(apiType);

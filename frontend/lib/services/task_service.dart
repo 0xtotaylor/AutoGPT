@@ -98,4 +98,12 @@ class TaskService {
   bool isTaskDeleted(String taskId) {
     return _deletedTaskIds.contains(taskId);
   }
+
+  Future installPlugin(String pluginUrl) async {
+    try {
+      await api.post('install-plugin', {'pluginUrl': pluginUrl});
+    } catch (e) {
+      throw Exception('Failed to install plugin: $e');
+    }
+  }
 }
