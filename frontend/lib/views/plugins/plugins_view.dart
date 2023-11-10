@@ -63,11 +63,22 @@ class PluginsView extends StatelessWidget {
                                                       Colors.white),
                                               child: const Text('Install'),
                                             ),
-                                          if (viewModel.installedPlugin !=
+                                          if (viewModel.installedPlugin ==
                                               plugin['link'])
-                                            const SizedBox(
-                                              width: 8,
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                viewModel.installPlugin(
+                                                    plugin['link']);
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.red,
+                                                  foregroundColor:
+                                                      Colors.white),
+                                              child: const Text('Uninstall'),
                                             ),
+                                          const SizedBox(
+                                            width: 8,
+                                          ),
                                           ElevatedButton(
                                             onPressed: () {
                                               _launchURL(plugin['link']);
