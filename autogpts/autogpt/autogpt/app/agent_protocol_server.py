@@ -123,25 +123,28 @@ class AgentProtocolServer:
                 pass
 
             try:
-                plugin_repo_directory = os.path.join(plugins_directory, "temp", repository_name)
-                # Try cloning from 'master' branch
+                temp_directory = os.path.join(plugins_directory, "temp")
+                if not os.path.exists(temp_directory):
+                    os.makedirs(temp_directory)
+                plugin_repo_directory = os.path.join(temp_directory, repository_name)
                 try:
                     repo = git.Repo.clone_from(repository_url, plugin_repo_directory, branch='master')
                 except Exception:
-                    # If 'master' branch doesn't exist, try cloning from 'main' branch
                     repo = git.Repo.clone_from(repository_url, plugin_repo_directory, branch='main')
                 zip_file_path = os.path.join(plugins_directory, repository_name)
                 if os.path.exists(f"{zip_file_path}.zip"):
                     os.remove(f"{zip_file_path}.zip")
                 shutil.make_archive(zip_file_path, 'zip', plugin_repo_directory)
-                shutil.rmtree(plugin_repo_directory)
+                shutil.rmtree(temp_directory)
                 with open(plugins_config_path, 'a') as file:
                     # TODO: Get plugin name for config
-                    plugin_config = "\nMindwarePlugin:\n  config: {}\n  enabled: true"
+                    plugin_config = f"\n{repository_name}:\n  config: {{}}\n  enabled: true"
                     file.write(plugin_config)
                 print(f"Plugin added successfully")
             except Exception as e:
                 print(f"Error adding plugin: {e}")
+                if os.path.exists(temp_directory):
+                    shutil.rmtree(temp_directory)
 
         # Used to access the methods on this class from API route handlers
         app.add_middleware(AgentMiddleware, agent=self)
@@ -155,30 +158,28 @@ class AgentProtocolServer:
         @app.post("/ap/v1/uninstall-plugin", include_in_schema=False)
         async def uninstall_plugin(request: Request):
             body = await request.json()
-            plugin_name = body.get('pluginName')
+            plugin_url = body.get('pluginUrl')
             plugins_directory = 'plugins'
-            plugins_config_path = 'plugins_config.yaml'
+            
+            parsed_url = urlparse(plugin_url)
+            path_components = parsed_url.path.strip("/").split("/")
+            repository_name = path_components[1]
+            print("repo name: " + repository_name)
 
             if not os.path.exists(plugins_directory):
-                print("No plugins installed.")
+                print("Plugins directory does not exist.")
                 return
 
-            plugin_path = os.path.join(plugins_directory, plugin_name)
-            if not os.path.exists(plugin_path):
-                print(f"Plugin {plugin_name} not found.")
+            plugin_zip_file = os.path.join(plugins_directory, f"{repository_name}.zip")
+            if not os.path.exists(plugin_zip_file):
+                print("Plugin zip file does not exist.")
                 return
 
             try:
-                shutil.rmtree(plugin_path)
-                with open(plugins_config_path, 'r') as file:
-                    lines = file.readlines()
-                with open(plugins_config_path, 'w') as file:
-                    for line in lines:
-                        if line.strip("\n") != plugin_name:
-                            file.write(line)
-                print(f"Plugin {plugin_name} uninstalled successfully.")
+                os.remove(plugin_zip_file)
+                print(f"Plugin {repository_name} removed successfully")
             except Exception as e:
-                print(f"Error uninstalling plugin: {e}")
+                print(f"Error removing plugin: {e}")
 
     async def create_task(self, task_request: TaskRequestBody) -> Task:
         """

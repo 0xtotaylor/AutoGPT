@@ -21,9 +21,9 @@ class PluginsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future uninstallPlugin(String pluginName) async {
-    await taskService.uninstallPlugin(pluginName);
-    uninstalledPlugin = pluginName;
+  Future uninstallPlugin(String pluginUrl) async {
+    await taskService.uninstallPlugin(pluginUrl);
+    uninstalledPlugin = pluginUrl;
     notifyListeners();
   }
 }

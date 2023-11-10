@@ -107,9 +107,9 @@ class TaskService {
     }
   }
 
-  Future uninstallPlugin(String pluginName) async {
+  Future uninstallPlugin(String pluginUrl) async {
     try {
-      await api.post('uninstall-plugin', {'pluginName': pluginName});
+      await api.post('uninstall-plugin', {'pluginUrl': pluginUrl});
     } catch (e) {
       throw Exception('Failed to uninstall plugin: $e');
     }
