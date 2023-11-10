@@ -6,6 +6,7 @@ class PluginsViewModel extends ChangeNotifier {
   final PluginService pluginService;
   final TaskService taskService;
   String installedPlugin = '';
+  String uninstalledPlugin = '';
 
   PluginsViewModel(this.pluginService, this.taskService);
 
@@ -17,6 +18,12 @@ class PluginsViewModel extends ChangeNotifier {
   Future installPlugin(String pluginUrl) async {
     await taskService.installPlugin(pluginUrl);
     installedPlugin = pluginUrl;
+    notifyListeners();
+  }
+
+  Future uninstallPlugin(String pluginName) async {
+    await taskService.uninstallPlugin(pluginName);
+    uninstalledPlugin = pluginName;
     notifyListeners();
   }
 }

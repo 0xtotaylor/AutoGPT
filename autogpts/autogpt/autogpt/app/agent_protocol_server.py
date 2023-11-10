@@ -124,7 +124,12 @@ class AgentProtocolServer:
 
             try:
                 plugin_repo_directory = os.path.join(plugins_directory, "temp", repository_name)
-                repo = git.Repo.clone_from(repository_url, plugin_repo_directory, branch='master')
+                # Try cloning from 'master' branch
+                try:
+                    repo = git.Repo.clone_from(repository_url, plugin_repo_directory, branch='master')
+                except Exception:
+                    # If 'master' branch doesn't exist, try cloning from 'main' branch
+                    repo = git.Repo.clone_from(repository_url, plugin_repo_directory, branch='main')
                 zip_file_path = os.path.join(plugins_directory, repository_name)
                 if os.path.exists(f"{zip_file_path}.zip"):
                     os.remove(f"{zip_file_path}.zip")
@@ -146,6 +151,34 @@ class AgentProtocolServer:
 
         logger.info(f"AutoGPT server starting on http://localhost:{port}")
         await hypercorn_serve(app, config)
+    
+        @app.post("/ap/v1/uninstall-plugin", include_in_schema=False)
+        async def uninstall_plugin(request: Request):
+            body = await request.json()
+            plugin_name = body.get('pluginName')
+            plugins_directory = 'plugins'
+            plugins_config_path = 'plugins_config.yaml'
+
+            if not os.path.exists(plugins_directory):
+                print("No plugins installed.")
+                return
+
+            plugin_path = os.path.join(plugins_directory, plugin_name)
+            if not os.path.exists(plugin_path):
+                print(f"Plugin {plugin_name} not found.")
+                return
+
+            try:
+                shutil.rmtree(plugin_path)
+                with open(plugins_config_path, 'r') as file:
+                    lines = file.readlines()
+                with open(plugins_config_path, 'w') as file:
+                    for line in lines:
+                        if line.strip("\n") != plugin_name:
+                            file.write(line)
+                print(f"Plugin {plugin_name} uninstalled successfully.")
+            except Exception as e:
+                print(f"Error uninstalling plugin: {e}")
 
     async def create_task(self, task_request: TaskRequestBody) -> Task:
         """

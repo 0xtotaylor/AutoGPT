@@ -67,7 +67,7 @@ class PluginsView extends StatelessWidget {
                                               plugin['link'])
                                             ElevatedButton(
                                               onPressed: () {
-                                                viewModel.installPlugin(
+                                                viewModel.uninstallPlugin(
                                                     plugin['link']);
                                               },
                                               style: ElevatedButton.styleFrom(
