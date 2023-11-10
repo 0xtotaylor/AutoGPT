@@ -107,10 +107,10 @@ class AgentProtocolServer:
         @app.post("/ap/v1/install-plugin", include_in_schema=False)
         async def install_plugin(request: Request):
             body = await request.json()
-            plugin_url = body.get('pluginUrl')
-            plugins_directory = 'plugins'
-            plugins_config_path = 'plugins_config.yaml'
-            
+            plugin_url = body.get("pluginUrl")
+            plugins_directory = "plugins"
+            plugins_config_path = "plugins_config.yaml"
+
             parsed_url = urlparse(plugin_url)
             path_components = parsed_url.path.strip("/").split("/")
             repository_url = f"{parsed_url.scheme}://{parsed_url.netloc}/{path_components[0]}/{path_components[1]}"
@@ -119,7 +119,7 @@ class AgentProtocolServer:
             if not os.path.exists(plugins_directory):
                 os.makedirs(plugins_directory)
 
-            with open(plugins_config_path, 'a') as file:
+            with open(plugins_config_path, "a") as file:
                 pass
 
             try:
@@ -128,19 +128,25 @@ class AgentProtocolServer:
                     os.makedirs(temp_directory)
                 plugin_repo_directory = os.path.join(temp_directory, repository_name)
                 try:
-                    repo = git.Repo.clone_from(repository_url, plugin_repo_directory, branch='master')
+                    repo = git.Repo.clone_from(
+                        repository_url, plugin_repo_directory, branch="master"
+                    )
                 except Exception:
-                    repo = git.Repo.clone_from(repository_url, plugin_repo_directory, branch='main')
+                    repo = git.Repo.clone_from(
+                        repository_url, plugin_repo_directory, branch="main"
+                    )
                 zip_file_path = os.path.join(plugins_directory, repository_name)
                 if os.path.exists(f"{zip_file_path}.zip"):
                     os.remove(f"{zip_file_path}.zip")
-                shutil.make_archive(zip_file_path, 'zip', plugin_repo_directory)
+                shutil.make_archive(zip_file_path, "zip", plugin_repo_directory)
                 shutil.rmtree(temp_directory)
-                with open(plugins_config_path, 'a') as file:
+                with open(plugins_config_path, "a") as file:
                     # TODO: Get plugin name for config
-                    plugin_config = f"\n{repository_name}:\n  config: {{}}\n  enabled: true"
+                    plugin_config = (
+                        f"\n{repository_name}:\n  config: {{}}\n  enabled: true"
+                    )
                     file.write(plugin_config)
-                print(f"Plugin added successfully")
+                print(f"Plugin {repository_name} added successfully")
             except Exception as e:
                 print(f"Error adding plugin: {e}")
                 if os.path.exists(temp_directory):
@@ -154,17 +160,16 @@ class AgentProtocolServer:
 
         logger.info(f"AutoGPT server starting on http://localhost:{port}")
         await hypercorn_serve(app, config)
-    
+
         @app.post("/ap/v1/uninstall-plugin", include_in_schema=False)
         async def uninstall_plugin(request: Request):
             body = await request.json()
-            plugin_url = body.get('pluginUrl')
-            plugins_directory = 'plugins'
-            
+            plugin_url = body.get("pluginUrl")
+            plugins_directory = "plugins"
+
             parsed_url = urlparse(plugin_url)
             path_components = parsed_url.path.strip("/").split("/")
             repository_name = path_components[1]
-            print("repo name: " + repository_name)
 
             if not os.path.exists(plugins_directory):
                 print("Plugins directory does not exist.")
