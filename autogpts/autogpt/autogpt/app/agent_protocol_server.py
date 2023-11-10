@@ -152,15 +152,6 @@ class AgentProtocolServer:
                 if os.path.exists(temp_directory):
                     shutil.rmtree(temp_directory)
 
-        # Used to access the methods on this class from API route handlers
-        app.add_middleware(AgentMiddleware, agent=self)
-
-        config.loglevel = "ERROR"
-        config.bind = [f"0.0.0.0:{port}"]
-
-        logger.info(f"AutoGPT server starting on http://localhost:{port}")
-        await hypercorn_serve(app, config)
-
         @app.post("/ap/v1/uninstall-plugin", include_in_schema=False)
         async def uninstall_plugin(request: Request):
             body = await request.json()
@@ -176,6 +167,7 @@ class AgentProtocolServer:
                 return
 
             plugin_zip_file = os.path.join(plugins_directory, f"{repository_name}.zip")
+            print(plugin_zip_file)
             if not os.path.exists(plugin_zip_file):
                 print("Plugin zip file does not exist.")
                 return
@@ -185,6 +177,15 @@ class AgentProtocolServer:
                 print(f"Plugin {repository_name} removed successfully")
             except Exception as e:
                 print(f"Error removing plugin: {e}")
+
+        # Used to access the methods on this class from API route handlers
+        app.add_middleware(AgentMiddleware, agent=self)
+
+        config.loglevel = "ERROR"
+        config.bind = [f"0.0.0.0:{port}"]
+
+        logger.info(f"AutoGPT server starting on http://localhost:{port}")
+        await hypercorn_serve(app, config)
 
     async def create_task(self, task_request: TaskRequestBody) -> Task:
         """
